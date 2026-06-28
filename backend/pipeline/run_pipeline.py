@@ -73,6 +73,10 @@ def run(reset=True):
         _build_offers_and_history(c)
         _report(c, n_services)
 
+    # расширение охвата на новые города (после основного пайплайна, отдельным соединением)
+    from pipeline.expand_cities import expand
+    expand()
+
 
 def _build_offers_and_history(c):
     """offers = актуальная (последний год) минимальная цена per (clinic, service).

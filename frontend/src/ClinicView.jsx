@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { api, fmt } from './api'
 import { Spinner, CatIcon, Icon, Rating } from './ui'
 import { useLang } from './i18n'
+import { CITY, yandexOpen, gisRoute } from './geo'
 
 export default function ClinicView({ clinicId, onBook, go }) {
   const { t } = useLang()
@@ -41,6 +42,24 @@ export default function ClinicView({ clinicId, onBook, go }) {
           </div>
         </div>
       </div>
+
+      {CITY[cl.city] && (
+        <div className="mt-5">
+          <div className="overflow-hidden rounded-2xl border border-ink-100 shadow-card">
+            <iframe title="Яндекс.Карты" loading="lazy" className="h-64 w-full"
+              src={`https://yandex.ru/map-widget/v1/?ll=${CITY[cl.city][1]},${CITY[cl.city][0]}&z=12&pt=${CITY[cl.city][1]},${CITY[cl.city][0]},pm2rdm`} />
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a href={yandexOpen(CITY[cl.city][1], CITY[cl.city][0])} target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-ink-200 px-3 py-2 text-sm font-medium text-ink-600 transition-colors hover:border-ink-300">
+              <Icon name="mapPin" size={14} />{t('y.open')}
+            </a>
+            <a href={gisRoute(CITY[cl.city][1], CITY[cl.city][0])} target="_blank" rel="noreferrer" className="btn-primary text-sm">
+              <Icon name="arrow" size={14} />{t('g2.route')}
+            </a>
+          </div>
+        </div>
+      )}
 
       <h2 className="mb-3 mt-6 text-lg font-bold text-ink-900">
         {t('clinic.services')} <span className="font-normal text-ink-400">· {data.n_services}</span>
