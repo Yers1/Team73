@@ -51,7 +51,7 @@ export default function App() {
 
   const NavLink = ({ to, icon, children }) => (
     <button onClick={() => go({ name: to })} title={children}
-      className={`flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium transition sm:px-3 ${view.name === to ? 'text-brand-700' : 'text-ink-500 hover:text-ink-900'}`}>
+      className={`flex items-center gap-1.5 rounded-lg px-1.5 py-2 text-sm font-medium transition sm:px-3 ${view.name === to ? 'text-brand-700' : 'text-ink-500 hover:text-ink-900'}`}>
       <Icon name={icon} size={18} />
       <span className="hidden lg:inline">{children}</span>
     </button>
@@ -60,7 +60,7 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-40 border-b border-ink-100 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+        <div className="mx-auto flex max-w-6xl items-center gap-2 px-3 py-3 sm:gap-3 sm:px-4">
           <button onClick={() => go({ name: 'home' })} className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white">
               <Icon name="cross" size={20} solid />
@@ -75,9 +75,9 @@ export default function App() {
           )}
 
           <nav className="ml-auto flex items-center gap-0.5 sm:gap-1">
-            <NavLink to="home" icon="search">{t('nav.search')}</NavLink>
+            <span className="hidden sm:flex"><NavLink to="home" icon="search">{t('nav.search')}</NavLink></span>
             <NavLink to="map" icon="mapPin">{t('nav.map')}</NavLink>
-            <NavLink to="admin" icon="activity">{t('nav.data')}</NavLink>
+            <span className="hidden sm:flex"><NavLink to="admin" icon="activity">{t('nav.data')}</NavLink></span>
             <button onClick={() => go({ name: 'favorites' })}
               title={t('nav.fav')} aria-label={t('nav.fav')}
               className={`relative rounded-lg p-2 transition ${view.name === 'favorites' ? 'text-rose-500' : 'text-ink-400 hover:text-rose-500'}`}>
@@ -86,16 +86,16 @@ export default function App() {
                 <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">{favIds.size}</span>
               )}
             </button>
-            <div className="mx-1 flex items-center rounded-lg border border-ink-200 p-0.5 text-xs font-semibold">
+            <div className="mx-0.5 flex items-center rounded-lg border border-ink-200 p-0.5 text-xs font-semibold">
               {['ru', 'kk'].map((l) => (
                 <button key={l} onClick={() => setLang(l)}
-                  className={`rounded-md px-2 py-1 transition-colors ${lang === l ? 'bg-brand-600 text-white' : 'text-ink-500 hover:text-ink-900'}`}>
+                  className={`rounded-md px-1.5 py-1 transition-colors ${lang === l ? 'bg-brand-600 text-white' : 'text-ink-500 hover:text-ink-900'}`}>
                   {l === 'ru' ? 'РУ' : 'ҚАЗ'}
                 </button>
               ))}
             </div>
             <button onClick={() => go({ name: 'basket' })}
-              className="relative inline-flex items-center gap-2 rounded-xl bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700">
+              className="relative inline-flex items-center gap-2 rounded-xl bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700 sm:px-3.5">
               <Icon name="basket" size={17} strokeWidth={2} />
               <span className="hidden sm:inline">{t('nav.basket')}</span>
               {basket.length > 0 && (
