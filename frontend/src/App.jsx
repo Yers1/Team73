@@ -5,16 +5,22 @@ import Results from './Results'
 import ServiceDetail from './ServiceDetail'
 import Basket from './Basket'
 import MapView from './MapView'
+import ClinicView from './ClinicView'
+import Favorites from './Favorites'
 import Admin from './Admin'
 import Assistant from './Assistant'
+import Booking from './Booking'
 import { Icon } from './ui'
 import { useLang } from './i18n'
+import { useFav } from './store'
 
 const LS = 'medprice_basket'
 
 export default function App() {
   const { t, lang, setLang } = useLang()
+  const { ids: favIds } = useFav()
   const [view, setView] = useState({ name: 'home' })
+  const [booking, setBooking] = useState(null)
   const [basket, setBasket] = useState(() => {
     try { return JSON.parse(localStorage.getItem(LS)) || [] } catch { return [] }
   })
@@ -25,6 +31,9 @@ export default function App() {
   const go = (v) => setView(v)
   const onSearch = (q) => q?.trim() && setView({ name: 'results', query: q.trim() })
   const onPickService = (s) => setView({ name: 'service', id: s.id })
+  const onOpenClinic = (cl) => setView({ name: 'clinic', id: cl.id || cl.clinic_id })
+  const openBooking = (clinicName, clinicId, service) =>
+    setBooking({ clinic: clinicName, clinic_id: clinicId, service })
 
   const addToBasket = (item) =>
     setBasket((b) => b.some((x) => x.service_id === item.service_id) ? b : [...b, item])
@@ -49,7 +58,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
       <header className="sticky top-0 z-40 border-b border-ink-100 bg-white/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
           <button onClick={() => go({ name: 'home' })} className="flex items-center gap-2.5">
@@ -69,7 +77,15 @@ export default function App() {
             <NavLink to="home">{t('nav.search')}</NavLink>
             <NavLink to="map">{t('nav.map')}</NavLink>
             <NavLink to="admin">{t('nav.data')}</NavLink>
-            <div className="ml-1 mr-1 flex items-center rounded-lg border border-ink-200 p-0.5 text-xs font-semibold">
+            <button onClick={() => go({ name: 'favorites' })}
+              title={t('nav.fav')} aria-label={t('nav.fav')}
+              className={`relative rounded-lg p-2 transition ${view.name === 'favorites' ? 'text-rose-500' : 'text-ink-400 hover:text-rose-500'}`}>
+              <Icon name="heart" size={19} solid={favIds.size > 0} />
+              {favIds.size > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">{favIds.size}</span>
+              )}
+            </button>
+            <div className="mx-1 flex items-center rounded-lg border border-ink-200 p-0.5 text-xs font-semibold">
               {['ru', 'kk'].map((l) => (
                 <button key={l} onClick={() => setLang(l)}
                   className={`rounded-md px-2 py-1 transition-colors ${lang === l ? 'bg-brand-600 text-white' : 'text-ink-500 hover:text-ink-900'}`}>
@@ -89,13 +105,14 @@ export default function App() {
         </div>
       </header>
 
-      {/* Views */}
       <main>
         {view.name === 'home' && <Home onSearch={onSearch} onPickService={onPickService} onPreset={onPreset} go={go} />}
-        {view.name === 'results' && <Results query={view.query} onPickService={onPickService} onSearch={onSearch} />}
-        {view.name === 'service' && <ServiceDetail serviceId={view.id} onAdd={addToBasket} go={go} />}
+        {view.name === 'results' && <Results query={view.query} onPickService={onPickService} />}
+        {view.name === 'service' && <ServiceDetail serviceId={view.id} onAdd={addToBasket} onBook={openBooking} go={go} />}
         {view.name === 'basket' && <Basket basket={basket} onRemove={removeFromBasket} onClear={clearBasket} go={go} />}
-        {view.name === 'map' && <MapView onPickClinic={(cl) => go({ name: 'home' })} />}
+        {view.name === 'map' && <MapView onOpenClinic={onOpenClinic} />}
+        {view.name === 'clinic' && <ClinicView clinicId={view.id} onBook={(cl, name) => openBooking(cl.name, cl.id, name)} go={go} />}
+        {view.name === 'favorites' && <Favorites onPickService={onPickService} go={go} />}
         {view.name === 'admin' && <Admin />}
       </main>
 
@@ -107,6 +124,7 @@ export default function App() {
         onOpenService={(id) => go({ name: 'service', id })}
         onOpenBasket={openBasketWith}
       />
+      {booking && <Booking target={booking} onClose={() => setBooking(null)} />}
     </div>
   )
 }

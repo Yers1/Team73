@@ -137,7 +137,8 @@ def autocomplete(q: str = Query(""), limit: int = 8):
 
 @app.get("/api/search")
 def search(q: str = Query(""), city: str = "", category: str = "",
-           sort: str = "popular", limit: int = 40):
+           sort: str = "popular", price_min: float = 0, price_max: float = 0,
+           limit: int = 40):
     q = q.strip()
     with get_conn() as c:
         params, where = [], []
@@ -151,6 +152,10 @@ def search(q: str = Query(""), city: str = "", category: str = "",
             where.append("o.category = ?"); params.append(category)
         if city:
             where.append("cl.city = ?"); params.append(city)
+        if price_min > 0:
+            where.append("o.price_kzt >= ?"); params.append(price_min)
+        if price_max > 0:
+            where.append("o.price_kzt <= ?"); params.append(price_max)
         wsql = (" WHERE " + " AND ".join(where)) if where else ""
         order = {
             "popular": "nclinics DESC, spread DESC",

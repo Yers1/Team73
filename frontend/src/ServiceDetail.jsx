@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { api, fmt } from './api'
-import { Spinner, FairBadge, PriceBar, Spark, CatIcon, Icon, Rating } from './ui'
+import { Spinner, FairBadge, PriceBar, Spark, CatIcon, Icon, Rating, FavHeart } from './ui'
 import { useLang } from './i18n'
 
-function OfferRow({ o, idx, min, max, serviceId, onAddClinic }) {
+function OfferRow({ o, idx, min, max, serviceId, serviceName, onAddClinic, onBook }) {
   const { t } = useLang()
   const [hist, setHist] = useState(null)
   const [show, setShow] = useState(false)
@@ -41,12 +41,13 @@ function OfferRow({ o, idx, min, max, serviceId, onAddClinic }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 md:w-64 md:justify-end">
+        <div className="flex items-center gap-3 md:w-72 md:justify-end">
           <div className="text-right">
             <div className="text-2xl font-extrabold tabular-nums text-ink-900">{fmt(o.price_kzt)}</div>
             <a href={o.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-ink-400 hover:text-brand-700">{t('source')}<Icon name="source" size={12} /></a>
           </div>
           <button onClick={() => onAddClinic(o)} title={t('addToBasket')} className="btn-ghost px-2.5 py-2"><Icon name="plus" size={16} /></button>
+          <button onClick={() => onBook(o.clinic, o.clinic_id, serviceName)} className="btn-primary px-3 py-2 text-xs">{t('book')}</button>
         </div>
       </div>
 
@@ -60,7 +61,7 @@ function OfferRow({ o, idx, min, max, serviceId, onAddClinic }) {
   )
 }
 
-export default function ServiceDetail({ serviceId, onAdd, go }) {
+export default function ServiceDetail({ serviceId, onAdd, onBook, go }) {
   const { t } = useLang()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -103,9 +104,12 @@ export default function ServiceDetail({ serviceId, onAdd, go }) {
               </div>
             </div>
           </div>
-          <button onClick={() => onAdd({ service_id: s.id, name: s.name })} className="btn-primary">
-            <Icon name="plus" size={16} />{t('addToBasket')}
-          </button>
+          <div className="flex items-center gap-2">
+            <FavHeart item={{ service_id: s.id, name: s.name, category: s.category }} size={20} className="border border-ink-200" />
+            <button onClick={() => onAdd({ service_id: s.id, name: s.name })} className="btn-primary">
+              <Icon name="plus" size={16} />{t('addToBasket')}
+            </button>
+          </div>
         </div>
 
         {st?.count > 0 && (
@@ -138,7 +142,8 @@ export default function ServiceDetail({ serviceId, onAdd, go }) {
 
       <div className="mt-3 overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-card divide-y divide-ink-100">
         {data.offers.map((o, i) => (
-          <OfferRow key={o.id} o={o} idx={i} min={st.min} max={st.max} serviceId={s.id} onAddClinic={() => onAdd({ service_id: s.id, name: s.name })} />
+          <OfferRow key={o.id} o={o} idx={i} min={st.min} max={st.max} serviceId={s.id}
+            serviceName={s.name} onAddClinic={() => onAdd({ service_id: s.id, name: s.name })} onBook={onBook} />
         ))}
         {!data.offers.length && <div className="p-8 text-center text-ink-400">{t('noOffers')}</div>}
       </div>

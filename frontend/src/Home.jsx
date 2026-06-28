@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api, fmt, fmtN } from './api'
-import { Stat, CatIcon, Icon } from './ui'
+import { Stat, CatIcon, Icon, FavHeart } from './ui'
 import { useLang } from './i18n'
 import SearchBar from './SearchBar'
 
@@ -90,20 +90,23 @@ export default function Home({ onSearch, onPickService, onPreset }) {
         <p className="mt-1.5 text-ink-500">{t('popular.subtitle')}</p>
         <div className="mt-7 grid gap-3 md:grid-cols-2">
           {popular.map((s) => (
-            <button key={s.id} onClick={() => onPickService(s)}
-              className="card flex items-center gap-4 p-4 text-left transition-colors hover:border-ink-300">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ink-100 text-ink-500">
-                <CatIcon c={s.category} size={20} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-semibold text-ink-900">{s.name}</div>
-                <div className="text-xs text-ink-400">{s.nclinics} {t('clinicsN')} · {t('cat.' + s.category)}</div>
-              </div>
+            <div key={s.id}
+              className="card flex items-center gap-4 p-4 transition-colors hover:border-ink-300">
+              <button onClick={() => onPickService(s)} className="flex min-w-0 flex-1 items-center gap-4 text-left">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ink-100 text-ink-500">
+                  <CatIcon c={s.category} size={20} />
+                </span>
+                <div className="min-w-0">
+                  <div className="truncate font-semibold text-ink-900">{s.name}</div>
+                  <div className="text-xs text-ink-400">{s.nclinics} {t('clinicsN')} · {t('cat.' + s.category)}</div>
+                </div>
+              </button>
               <div className="text-right">
                 <div className="text-sm text-ink-500">{t('from')} <b className="tabular-nums text-ink-900">{fmt(s.min_price)}</b></div>
                 <div className="text-xs font-semibold tabular-nums text-brand-700">{t('saveUpTo')} {fmt(s.max_price - s.min_price)}</div>
               </div>
-            </button>
+              <FavHeart item={{ service_id: s.id, name: s.name, category: s.category, min_price: s.min_price, nclinics: s.nclinics }} />
+            </div>
           ))}
         </div>
       </section>

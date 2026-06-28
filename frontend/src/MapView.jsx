@@ -8,7 +8,7 @@ const CITY = {
   'Актобе': [50.2839, 57.167], 'Павлодар': [52.2873, 76.9674],
 }
 
-export default function MapView({ onPickClinic }) {
+export default function MapView({ onOpenClinic }) {
   const { t } = useLang()
   const ref = useRef(null)
   const map = useRef(null)
@@ -38,8 +38,8 @@ export default function MapView({ onPickClinic }) {
         iconSize: [34, 34], iconAnchor: [17, 17],
       })
       const m = window.L.marker([lat, lng], { icon }).addTo(map.current)
-      m.bindPopup(`<b>${cl.name}</b><br/>${cl.city} · ★ ${cl.rating}<br/>${cl.n_services} услуг · от ${fmt(cl.min_price)}`)
-      m.on('click', () => onPickClinic && onPickClinic(cl))
+      m.bindPopup(`<b>${cl.name}</b><br/>${cl.city} · ★ ${cl.rating}<br/>${cl.n_services} услуг · от ${fmt(cl.min_price)}<br/><span style="color:#047857;font-weight:600">Открыть и записаться →</span>`)
+      m.on('click', () => onOpenClinic && onOpenClinic(cl))
     })
   }, [clinics])
 

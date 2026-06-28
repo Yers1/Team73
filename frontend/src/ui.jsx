@@ -1,5 +1,20 @@
 import { fmt } from './api'
 import { useLang } from './i18n'
+import { useFav } from './store'
+
+/* Кнопка «в избранное» (сердце) */
+export function FavHeart({ item, size = 18, className = '' }) {
+  const { isFav, toggle } = useFav()
+  const { t } = useLang()
+  const on = isFav(item.service_id)
+  return (
+    <button onClick={(e) => { e.stopPropagation(); toggle(item) }}
+      title={on ? t('fav.remove') : t('fav.add')} aria-label={on ? t('fav.remove') : t('fav.add')}
+      className={`shrink-0 rounded-lg p-1.5 transition-colors hover:bg-ink-100 ${className}`}>
+      <Icon name="heart" size={size} solid={on} className={on ? 'text-rose-500' : 'text-ink-300'} />
+    </button>
+  )
+}
 
 /* ── Единый набор line-иконок (stroke, currentColor, без эмодзи) ───────────── */
 const ICONS = {
