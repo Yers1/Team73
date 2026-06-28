@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+# БД с реальными данными ВКЛЮЧЕНА в поставку (требование ТЗ).
+# Игнорируем только временные WAL-файлы:
+backend/data/*.db-wal
+backend/data/*.db-shm
+
+# Node
+node_modules/
+frontend/dist/
+
+# Vercel
+.vercel/
+
+# Playwright / temp
+.playwright-mcp/
+*.tmp
+
+.vercel

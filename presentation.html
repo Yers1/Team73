@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MedPrice.kz — презентация</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#ffffff; --panel:#F8FAFC; --line:#E2E8F0;
+  --ink:#0F172A; --text:#334155; --muted:#64748B; --dim:#94A3B8;
+  --accent:#047857; --accent2:#0F766E; --accent-soft:#ECFDF5;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow:hidden;
+  font-feature-settings:"cv05","ss01";-webkit-font-smoothing:antialiased}
+.tnum{font-variant-numeric:tabular-nums}
+.slide-deck{position:relative;width:100vw;height:100vh;overflow:hidden;background:var(--bg)}
+@media(min-width:769px){.slide-deck{max-width:calc(100vh*16/9);max-height:calc(100vw*9/16);margin:auto;position:absolute;inset:0;
+  box-shadow:0 0 0 1px var(--line)}}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(34px,5.2vw,88px);opacity:0;visibility:hidden;transition:opacity .4s ease;background:var(--bg);overflow:hidden}
+.slide.active{opacity:1;visibility:visible}
+.wrap{width:100%;max-width:1080px;margin:0 auto}
+.kicker{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.kicker .bar{width:24px;height:2px;background:var(--accent);border-radius:2px}
+h1{font-size:clamp(44px,7.5vw,92px);font-weight:800;line-height:1;letter-spacing:-.03em;color:var(--ink)}
+h2{font-size:clamp(26px,3.6vw,44px);font-weight:800;line-height:1.08;letter-spacing:-.02em;color:var(--ink)}
+.lead{font-size:clamp(17px,1.9vw,22px);color:var(--muted);line-height:1.5;max-width:50ch}
+.accent{color:var(--accent)} .muted{color:var(--muted)} .dim{color:var(--dim)} .ink{color:var(--ink)}
+.qh{font-size:clamp(15px,1.6vw,18px);font-weight:700;color:var(--ink);margin-bottom:14px;
+  padding-bottom:10px;border-bottom:1px solid var(--line)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.flist{display:grid;gap:13px}
+.fitem{display:flex;gap:12px;align-items:flex-start;font-size:clamp(14px,1.4vw,16.5px);line-height:1.45}
+.fitem .b{flex:none;width:22px;height:22px;border-radius:6px;background:var(--accent-soft);
+  color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;margin-top:1px}
+.fitem b{font-weight:700;color:var(--ink)} .fitem div{color:var(--text)}
+.statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:30px;
+  border-top:1px solid var(--line);padding-top:24px}
+.stat .n{font-size:clamp(28px,3.4vw,44px);font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.stat .l{font-size:13px;color:var(--muted);margin-top:4px}
+.tag{font-size:13px;font-weight:600;color:var(--text);background:var(--bg);
+  border:1px solid var(--line);border-radius:7px;padding:7px 13px}
+.pill{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.card{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:22px 24px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.card .ct{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.canvas-h{position:relative;height:clamp(210px,33vh,320px)}
+.note{font-size:13px;color:var(--muted);text-align:center;margin-top:6px}
+.url{display:inline-flex;align-items:center;gap:12px;background:var(--accent);border-radius:11px;
+  padding:14px 22px;font-size:clamp(16px,1.9vw,22px);font-weight:700;color:#fff;text-decoration:none}
+.url .live{font-size:11px;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:.1em;text-transform:uppercase}
+.slide.active .reveal{animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both}
+.slide.active .reveal:nth-child(2){animation-delay:.05s}
+.slide.active .reveal:nth-child(3){animation-delay:.1s}
+.slide.active .reveal:nth-child(4){animation-delay:.15s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);transition:width .35s;z-index:50}
+.logo{position:fixed;top:24px;left:28px;z-index:40;display:flex;align-items:center;gap:9px;font-weight:800;font-size:15px;color:var(--ink)}
+.logo .m{width:26px;height:26px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+.nav{position:fixed;bottom:24px;right:28px;z-index:40;display:flex;align-items:center;gap:13px}
+.nav .c{font-size:13px;color:var(--dim)}
+.nb{width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--bg);
+  color:var(--text);cursor:pointer;font-size:16px;transition:.15s}
+.nb:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:768px){.split{grid-template-columns:1fr;gap:24px}.statrow{grid-template-columns:repeat(2,1fr);gap:18px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="progress" id="pb"></div>
+<div class="logo"><span class="m"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M10.5 3.5h3a1 1 0 0 1 1 1v4h4a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-4v4a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1v-4h-4a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h4v-4a1 1 0 0 1 1-1z"/></svg></span>MedPrice<span class="accent">.kz</span></div>
+
+<div class="slide-deck">
+
+<!-- 1 — ТИТУЛ -->
+<section class="slide active">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="bar"></span>Кейс 1 · MedServicePrice</div>
+    <h1 class="reveal" style="margin-top:22px">MedPrice<span class="accent">.kz</span></h1>
+    <p class="lead reveal" style="margin-top:22px;font-size:clamp(18px,2.1vw,25px);color:var(--text)">
+      Агрегатор и сравнение цен на медицинские услуги Казахстана.
+    </p>
+    <div class="tags reveal" style="margin-top:34px">
+      <span class="tag">Команда № ___</span>
+      <span class="tag">Караганда 2026 г.</span>
+      <span class="pill">medtech-self.vercel.app</span>
+    </div>
+  </div>
+</section>
+
+<!-- 2 — КРАТКОЕ ОПИСАНИЕ ПРОДЕЛАННОЙ РАБОТЫ -->
+<section class="slide">
+  <div class="wrap">
+    <h2 class="reveal">Краткое описание проделанной работы</h2>
+    <div class="split reveal" style="margin-top:30px">
+      <div>
+        <div class="qh">Какие ресурсы использованы?</div>
+        <div class="flist">
+          <div class="fitem"><span class="b">›</span><div>Прайсы <b>8 клиник</b> в форматах PDF, DOCX, Excel — включая сканы</div></div>
+          <div class="fitem"><span class="b">›</span><div>Справочник услуг для нормализации</div></div>
+          <div class="fitem"><span class="b">›</span><div>Стек: <b>Python · FastAPI · SQLite · React · Vercel</b></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="qh">Какие результаты получили?</div>
+        <div class="flist">
+          <div class="fitem"><span class="b">✓</span><div>Парсер всех форматов, очистка OCR, нормализация по <b>коду тарификатора</b></div></div>
+          <div class="fitem"><span class="b">✓</span><div>Поиск, сравнение, медкорзина-оптимизатор, история цен, AI-ассистент (рус/каз), карта</div></div>
+          <div class="fitem"><span class="b">✓</span><div>Рабочий MVP, задеплоен онлайн</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="statrow reveal">
+      <div class="stat"><div class="n accent tnum">2 050</div><div class="l">цен в базе</div></div>
+      <div class="stat"><div class="n tnum">8 / 5</div><div class="l">клиник / городов</div></div>
+      <div class="stat"><div class="n tnum">778</div><div class="l">услуг с ценой</div></div>
+      <div class="stat"><div class="n accent tnum">3 558</div><div class="l">точных совпадений по коду</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 — ДЕМОНСТРАЦИЯ ПРОТОТИПА -->
+<section class="slide">
+  <div class="wrap split" style="align-items:center">
+    <div>
+      <h2 class="reveal">Демонстрация прототипа</h2>
+      <p class="lead reveal" style="margin-top:14px">Показ вживую через демонстрацию экрана:</p>
+      <div class="flist reveal" style="margin-top:16px">
+        <div class="fitem"><span class="b">1</span><div>Поиск услуги → сравнение цен по клиникам</div></div>
+        <div class="fitem"><span class="b">2</span><div>«Честная цена» и история цены по годам</div></div>
+        <div class="fitem"><span class="b">3</span><div>Медкорзина — оптимальная раскладка по клиникам</div></div>
+        <div class="fitem"><span class="b">4</span><div>AI-ассистент (рус/каз) и карта клиник</div></div>
+      </div>
+      <a class="url reveal" href="https://medtech-self.vercel.app" style="margin-top:26px">
+        <span class="live">live</span>medtech-self.vercel.app
+      </a>
+    </div>
+    <div class="card reveal">
+      <div class="ct">Стоимость базового чек-апа, ₸</div>
+      <div class="canvas-h"><canvas id="eco"></canvas></div>
+      <div class="note">Оптимальная раскладка экономит до <b class="accent">68%</b></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="nav">
+  <button class="nb" onclick="prev()">←</button>
+  <span class="c"><span id="cur">1</span> / <span id="tot">3</span></span>
+  <button class="nb" onclick="next()">→</button>
+</div>
+
+<script>
+let cur=1; const slides=document.querySelectorAll('.slide'); const tot=slides.length;
+document.getElementById('tot').textContent=tot; let ecoDone=false;
+if(window.ChartDataLabels)Chart.register(window.ChartDataLabels);
+function show(n){
+  cur=Math.max(1,Math.min(tot,n));
+  slides.forEach((s,i)=>s.classList.toggle('active',i===cur-1));
+  document.getElementById('cur').textContent=cur;
+  document.getElementById('pb').style.width=(cur/tot*100)+'%';
+  if(cur===3&&!ecoDone)drawEco();
+}
+function next(){show(cur+1)} function prev(){show(cur-1)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next()}
+  if(e.key==='ArrowLeft'){e.preventDefault();prev()}
+});
+function drawEco(){ecoDone=true;new Chart(document.getElementById('eco'),{type:'bar',
+  data:{labels:['Оптимально','В одной клинике','Худший вариант'],
+    datasets:[{data:[6680,8800,20920],backgroundColor:['#047857','#94A3B8','#CBD5E1'],
+      borderRadius:5,maxBarThickness:74}]},
+  options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:24}},
+    plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>c.raw.toLocaleString('ru-RU')+' ₸'}},
+      datalabels:{anchor:'end',align:'top',color:'#0F172A',font:{weight:'700',size:13},
+        formatter:v=>v.toLocaleString('ru-RU')+' ₸'}},
+    scales:{x:{grid:{display:false},border:{color:'#E2E8F0'},ticks:{color:'#334155',font:{weight:'600',size:12}}},
+      y:{grid:{color:'#EEF2F6'},border:{display:false},ticks:{color:'#94A3B8',
+        callback:v=>v.toLocaleString('ru-RU')},max:24000}}}});}
+show(1);
+</script>
+</body>
+</html>
