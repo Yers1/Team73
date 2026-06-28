@@ -10,9 +10,13 @@ export default function MapView({ onOpenClinic }) {
 
   useEffect(() => { api.clinics().then(setClinics) }, [])
 
-  const pts = yandexPoints(clinics)
+  const [city, setCity] = useState('')
+  const cityList = [...new Set(clinics.map((c) => c.city))].sort()
+  const shown = city ? clinics.filter((c) => c.city === city) : clinics
+  const pts = yandexPoints(shown)
   const nCities = new Set(clinics.map((c) => c.city)).size
-  const widget = `https://yandex.ru/map-widget/v1/?ll=68,48.5&z=4&pt=${pts}`
+  const center = city && CITY[city] ? `${CITY[city][1]},${CITY[city][0]}&z=11` : '68,48.5&z=4'
+  const widget = `https://yandex.ru/map-widget/v1/?ll=${center}&pt=${pts}`
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 fade-in">
@@ -21,10 +25,16 @@ export default function MapView({ onOpenClinic }) {
           <h1 className="text-2xl font-bold text-ink-900">{t('map.title')}</h1>
           <p className="mt-1 text-ink-500">{clinics.length} {t('map.subA')} {nCities} {t('map.subB')}</p>
         </div>
-        <a href={`https://yandex.ru/maps/?ll=68,48.5&z=5&pt=${pts}`} target="_blank" rel="noreferrer"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-ink-200 px-3 py-2 text-sm font-medium text-ink-600 transition-colors hover:border-ink-300">
-          {t('map.openY')}<Icon name="source" size={14} />
-        </a>
+        <div className="flex items-center gap-2">
+          <select value={city} onChange={(e) => setCity(e.target.value)} className="field py-2">
+            <option value="">{t('allCities')}</option>
+            {cityList.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <a href={`https://yandex.ru/maps/?ll=${city && CITY[city] ? `${CITY[city][1]},${CITY[city][0]}&z=12` : '68,48.5&z=5'}&pt=${pts}`} target="_blank" rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-ink-200 px-3 py-2 text-sm font-medium text-ink-600 transition-colors hover:border-ink-300">
+            {t('map.openY')}<Icon name="source" size={14} />
+          </a>
+        </div>
       </div>
 
       <div className="mt-5 overflow-hidden rounded-2xl border border-ink-100 shadow-card">
@@ -35,7 +45,7 @@ export default function MapView({ onOpenClinic }) {
 
       <h2 className="mb-3 mt-8 text-lg font-bold text-ink-900">{t('map.list')}</h2>
       <div className="grid gap-3 md:grid-cols-2">
-        {clinics.map((cl) => {
+        {shown.map((cl) => {
           const b = CITY[cl.city]
           return (
             <div key={cl.id} className="card flex items-center gap-3 p-4 transition-colors hover:border-ink-300">

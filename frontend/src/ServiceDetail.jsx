@@ -81,6 +81,9 @@ export default function ServiceDetail({ serviceId, onAdd, onBook, go }) {
   const [sort, setSort] = useState('price_asc')
   const [cities, setCities] = useState([])
   const [market, setMarket] = useState(null)
+  const [pmin, setPmin] = useState('')
+  const [pmax, setPmax] = useState('')
+  const [minRating, setMinRating] = useState('')
 
   useEffect(() => { api.cities().then(setCities) }, [])
   useEffect(() => {
@@ -94,6 +97,9 @@ export default function ServiceDetail({ serviceId, onAdd, onBook, go }) {
   if (loading) return <Spinner />
   if (!data?.service) return <div className="p-12 text-center text-ink-400">{t('svcNotFound')}</div>
   const s = data.service, st = data.stats
+  const shownOffers = data.offers.filter((o) =>
+    (!pmin || o.price_kzt >= +pmin) && (!pmax || o.price_kzt <= +pmax) &&
+    (!minRating || o.rating >= +minRating))
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 fade-in">
@@ -145,6 +151,19 @@ export default function ServiceDetail({ serviceId, onAdd, onBook, go }) {
           <option value="">{t('allCities')}</option>
           {cities.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
+        <div className="flex items-center gap-1.5 rounded-xl border border-ink-200 bg-white px-3 py-1.5">
+          <span className="text-sm text-ink-400">{t('priceLabel')}</span>
+          <input value={pmin} onChange={(e) => setPmin(e.target.value.replace(/\D/g, ''))} inputMode="numeric" placeholder={t('priceFrom')} className="w-14 bg-transparent text-sm outline-none tabular-nums" />
+          <span className="text-ink-300">–</span>
+          <input value={pmax} onChange={(e) => setPmax(e.target.value.replace(/\D/g, ''))} inputMode="numeric" placeholder={t('priceTo')} className="w-14 bg-transparent text-sm outline-none tabular-nums" />
+        </div>
+        <select value={minRating} onChange={(e) => setMinRating(e.target.value)} className="field">
+          <option value="">{t('fl.rating')}: {t('fl.any')}</option>
+          <option value="4">★ 4.0+</option>
+          <option value="4.3">★ 4.3+</option>
+          <option value="4.5">★ 4.5+</option>
+        </select>
+        <span className="text-sm text-ink-400">{t('fl.found')}: <b className="text-ink-700">{shownOffers.length}</b></span>
         <div className="ml-auto flex items-center gap-2">
           {[['price_asc', t('sort.cheap')], ['price_desc', t('sort.expensive')], ['rating', t('sort.rating')]].map(([v, l]) => (
             <button key={v} onClick={() => setSort(v)} className={`chip ${sort === v ? 'chip-active' : ''}`}>{l}</button>
@@ -153,11 +172,11 @@ export default function ServiceDetail({ serviceId, onAdd, onBook, go }) {
       </div>
 
       <div className="mt-3 overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-card divide-y divide-ink-100">
-        {data.offers.map((o, i) => (
+        {shownOffers.map((o, i) => (
           <OfferRow key={o.id} o={o} idx={i} min={st.min} max={st.max} serviceId={s.id}
             serviceName={s.name} onAddClinic={() => onAdd({ service_id: s.id, name: s.name })} onBook={onBook} />
         ))}
-        {!data.offers.length && <div className="p-8 text-center text-ink-400">{t('noOffers')}</div>}
+        {!shownOffers.length && <div className="p-8 text-center text-ink-400">{t('noOffers')}</div>}
       </div>
     </div>
   )

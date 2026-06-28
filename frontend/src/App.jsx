@@ -49,10 +49,11 @@ export default function App() {
   }
   const openBasketWith = (items) => { addMany(items); setView({ name: 'basket' }) }
 
-  const NavLink = ({ to, children }) => (
-    <button onClick={() => go({ name: to })}
-      className={`rounded-lg px-3 py-2 text-sm font-medium transition ${view.name === to ? 'text-brand-700' : 'text-ink-500 hover:text-ink-900'}`}>
-      {children}
+  const NavLink = ({ to, icon, children }) => (
+    <button onClick={() => go({ name: to })} title={children}
+      className={`flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium transition sm:px-3 ${view.name === to ? 'text-brand-700' : 'text-ink-500 hover:text-ink-900'}`}>
+      <Icon name={icon} size={18} />
+      <span className="hidden lg:inline">{children}</span>
     </button>
   )
 
@@ -73,10 +74,10 @@ export default function App() {
             </div>
           )}
 
-          <nav className="ml-auto flex items-center gap-1">
-            <NavLink to="home">{t('nav.search')}</NavLink>
-            <NavLink to="map">{t('nav.map')}</NavLink>
-            <NavLink to="admin">{t('nav.data')}</NavLink>
+          <nav className="ml-auto flex items-center gap-0.5 sm:gap-1">
+            <NavLink to="home" icon="search">{t('nav.search')}</NavLink>
+            <NavLink to="map" icon="mapPin">{t('nav.map')}</NavLink>
+            <NavLink to="admin" icon="activity">{t('nav.data')}</NavLink>
             <button onClick={() => go({ name: 'favorites' })}
               title={t('nav.fav')} aria-label={t('nav.fav')}
               className={`relative rounded-lg p-2 transition ${view.name === 'favorites' ? 'text-rose-500' : 'text-ink-400 hover:text-rose-500'}`}>

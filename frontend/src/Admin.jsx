@@ -105,7 +105,7 @@ export default function Admin() {
 
       {/* ИСТОЧНИКИ */}
       {tab === 'sources' && (
-        <div className="mt-5 overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-card">
+        <div className="mt-5 overflow-x-auto rounded-2xl border border-ink-100 bg-white shadow-card">
           <table className="w-full text-sm">
             <thead className="bg-ink-50 text-left text-xs uppercase text-ink-400">
               <tr>
@@ -163,7 +163,7 @@ export default function Admin() {
           {!bookings.length ? (
             <div className="card p-12 text-center text-ink-400">{t('admin.noBookings')}</div>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-card divide-y divide-ink-100">
+            <div className="overflow-x-auto rounded-2xl border border-ink-100 bg-white shadow-card divide-y divide-ink-100">
               {bookings.map((b, i) => (
                 <div key={i} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
                   <div className="font-semibold text-ink-900">{b.service}</div>
