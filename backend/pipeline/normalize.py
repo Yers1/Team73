@@ -61,6 +61,7 @@ class Index:
         self.names = []        # нормализованные имена для fuzzy
         self.name_sid = []     # параллельно: sid для каждого имени
         self.svc = {}          # sid -> {name, category, ...}
+        self.blob = {}         # sid -> нормализованный текст (имя + все синонимы)
 
 
 def build_index(conn):
@@ -77,10 +78,13 @@ def build_index(conn):
             idx.by_exact.setdefault(n, sid)
             idx.names.append(n)
             idx.name_sid.append(sid)
-        for syn in json.loads(r['synonyms'] or '[]'):
+        syns = json.loads(r['synonyms'] or '[]')
+        for syn in syns:
             ns = norm_text(syn)
             if ns:
                 idx.by_syn.setdefault(ns, sid)
+        # полный текст для подстрочного поиска (имя + все синонимы), per-service
+        idx.blob[sid] = norm_text(r['name'] + ' ' + ' '.join(syns))
     return idx
 
 

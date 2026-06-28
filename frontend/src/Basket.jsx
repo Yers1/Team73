@@ -42,18 +42,21 @@ export default function Basket({ basket, onRemove, onClear, go }) {
             <p className="text-sm text-ink-500">{basket.length} {t('svcGen')} — {t('basket.optimize')}</p>
           </div>
         </div>
-        <button onClick={onClear} className="text-sm text-ink-400 transition-colors hover:text-rose-600">{t('clear')}</button>
-      </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.1fr]">
-        <div className="card p-5">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="font-semibold text-ink-900">{t('services')}</div>
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 text-sm font-medium text-ink-600">
+            {t('city')}
             <select value={city} onChange={(e) => setCity(e.target.value)} className="field py-1.5">
               <option value="">{t('allCities')}</option>
               {cities.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
-          </div>
+          </label>
+          <button onClick={onClear} className="text-sm text-ink-400 transition-colors hover:text-rose-600">{t('clear')}</button>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+        <div className="card p-5">
+          <div className="mb-3 font-semibold text-ink-900">{t('services')}</div>
           <div className="divide-y divide-ink-100">
             {basket.map((b) => (
               <div key={b.service_id} className="flex items-center gap-3 py-2.5">

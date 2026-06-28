@@ -99,20 +99,39 @@ def categories():
             "SELECT category, COUNT(*) n FROM offers GROUP BY category ORDER BY n DESC") if r["category"]]
 
 
+def _match_service_ids(idx, q):
+    """ID услуг по запросу: сильный индекс-матч + подстрочное совпадение по
+    нормализованным именам и синонимам. Регистронезависимо для кириллицы
+    (Python .lower() в norm_text), в отличие от SQLite LIKE."""
+    qn = norm_text(q)
+    ids = set()
+    m = match(q, None, idx)
+    if m.get("service_id"):
+        ids.add(m["service_id"])
+    if len(qn) >= 2:
+        for sid, blob in idx.blob.items():
+            if qn in blob:
+                ids.add(sid)
+    return ids
+
+
 @app.get("/api/autocomplete")
 def autocomplete(q: str = Query(""), limit: int = 8):
     q = q.strip()
     if len(q) < 2:
         return []
-    like = f"%{q}%"
+    ids = _match_service_ids(get_index(), q)
+    if not ids:
+        return []
     with get_conn() as c:
-        cur = c.execute("""
+        ph = ",".join("?" * len(ids))
+        cur = c.execute(f"""
             SELECT s.id, s.name, s.category, COUNT(DISTINCT o.clinic_id) nclinics,
                    MIN(o.price_kzt) min_price
             FROM services s JOIN offers o ON o.service_id = s.id
-            WHERE s.name LIKE ? OR s.synonyms LIKE ?
+            WHERE s.id IN ({ph})
             GROUP BY s.id ORDER BY nclinics DESC, LENGTH(s.name) ASC LIMIT ?""",
-            (like, like, limit))
+            list(ids) + [limit])
         return rows(cur)
 
 
@@ -123,12 +142,11 @@ def search(q: str = Query(""), city: str = "", category: str = "",
     with get_conn() as c:
         params, where = [], []
         if q:
-            # сильный матч через индекс (синонимы/коды/fuzzy) + LIKE для широты
-            m = match(q, None, get_index())
-            like = f"%{q}%"
-            where.append("(s.name LIKE ? OR s.synonyms LIKE ?"
-                         + (" OR s.id = ?" if m["service_id"] else "") + ")")
-            params += [like, like] + ([m["service_id"]] if m["service_id"] else [])
+            ids = _match_service_ids(get_index(), q)
+            if not ids:
+                return []
+            where.append(f"s.id IN ({','.join('?' * len(ids))})")
+            params += list(ids)
         if category:
             where.append("o.category = ?"); params.append(category)
         if city:
@@ -331,14 +349,18 @@ def presets():
 
 def _resolve_service(c, q):
     """Резолв запроса в услугу, у которой ЕСТЬ предложения (для пресетов/поиска)."""
-    m = match(q, None, get_index())
+    idx = get_index()
+    m = match(q, None, idx)
     if m["service_id"]:
         if c.execute("SELECT 1 FROM offers WHERE service_id=? LIMIT 1", (m["service_id"],)).fetchone():
             return m["service_id"]
-    like = f"%{q}%"
-    r = c.execute("""SELECT s.id FROM services s JOIN offers o ON o.service_id=s.id
-        WHERE s.name LIKE ? OR s.synonyms LIKE ? GROUP BY s.id
-        ORDER BY COUNT(DISTINCT o.clinic_id) DESC LIMIT 1""", (like, like)).fetchone()
+    ids = _match_service_ids(idx, q)
+    if not ids:
+        return m["service_id"]
+    ph = ",".join("?" * len(ids))
+    r = c.execute(f"""SELECT s.id FROM services s JOIN offers o ON o.service_id=s.id
+        WHERE s.id IN ({ph}) GROUP BY s.id
+        ORDER BY COUNT(DISTINCT o.clinic_id) DESC LIMIT 1""", list(ids)).fetchone()
     return r["id"] if r else m["service_id"]
 
 
