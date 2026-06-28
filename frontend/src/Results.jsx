@@ -85,6 +85,7 @@ export default function Results({ query, onPickService }) {
                 <div className="text-right">
                   <div className="text-xs text-ink-400">{t('from')}</div>
                   <div className="text-xl font-extrabold tabular-nums text-ink-900">{fmt(s.min_price)}</div>
+                  <div className="text-xs text-ink-400">{t('rangeTo')} {fmt(s.max_price)}</div>
                 </div>
                 <div className="hidden text-right sm:block">
                   <div className="text-xs text-ink-400">{t('saveUpTo')}</div>

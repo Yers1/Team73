@@ -23,6 +23,18 @@ function OfferRow({ o, idx, min, max, serviceId, serviceName, onAddClinic, onBoo
             <div className="mt-0.5 flex items-center gap-1.5 text-xs text-ink-400">
               <Icon name="mapPin" size={13} />{o.city}<span className="text-ink-300">·</span><Rating value={o.rating} />
             </div>
+            <div className="mt-1 space-y-0.5 text-xs text-ink-400">
+              {o.address && <div className="truncate">{o.address}</div>}
+              <div className="flex flex-wrap gap-x-2">
+                {o.phone && <span>{o.phone}</span>}
+                {o.working_hours && <span className="text-ink-300">·</span>}
+                {o.working_hours && <span>{o.working_hours}</span>}
+              </div>
+              <a href={`https://2gis.kz/search/${encodeURIComponent(o.clinic + ' ' + o.city)}`} target="_blank" rel="noreferrer"
+                className="inline-flex items-center gap-1 font-medium text-brand-700 hover:underline">
+                <Icon name="mapPin" size={12} />{t('g2.rev')}
+              </a>
+            </div>
           </div>
         </div>
 

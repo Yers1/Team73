@@ -34,6 +34,10 @@ export default function ClinicView({ clinicId, onBook, go }) {
               <span className="inline-flex items-center gap-1"><Icon name="clock" size={14} />{cl.working_hours}</span>
               <span className="inline-flex items-center gap-1"><Icon name="phone" size={14} />{cl.phone}</span>
             </div>
+            <a href={`https://2gis.kz/search/${encodeURIComponent(cl.name + ' ' + cl.city)}`} target="_blank" rel="noreferrer"
+              className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-ink-200 px-3 py-1.5 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50">
+              <Icon name="mapPin" size={14} />{t('g2.rev')}
+            </a>
           </div>
         </div>
       </div>
